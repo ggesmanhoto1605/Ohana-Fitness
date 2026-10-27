@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f6f3ee">
+<title>Desafio Ohana · 50 dias</title>
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f6f3ee;--card:#fffdf9;--ink:#233d33;--muted:#5f6e66;--line:#e3ddd3;--terra:#c47f6c;--sage:#8fa595}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif}
+  button{font-family:inherit;color:inherit}
+  .wrap{max-width:560px;margin:0 auto;padding:22px 16px 60px}
+  header{text-align:center}
+  .bars{display:flex;justify-content:space-between;margin-bottom:6px}
+  .bars i{display:block;width:70px;height:6px;border-radius:6px;background:var(--sage)}
+  .bars i+i{background:var(--terra)}
+  h1{margin:6px 0 0;font-size:40px;letter-spacing:2px;font-weight:700;line-height:1}
+  h1 span{display:block;font-family:"DM Serif Display",serif;color:var(--terra);font-weight:400;font-size:38px;letter-spacing:3px;margin-top:2px}
+  .sub{color:var(--muted);font-size:13px;letter-spacing:.5px;margin:8px 0 10px}
+  .dates{display:inline-block;background:#dfe5dc;border-radius:20px;padding:6px 18px;font-weight:700;font-size:14px}
+
+  /* quem é você */
+  .picker{margin-top:26px;text-align:center}
+  .picker h2{font-size:20px;margin:0 0 4px}
+  .picker p{color:var(--muted);font-size:14px;margin:0 0 16px}
+  .people{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .person{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px 10px;font-size:17px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .person:active{transform:scale(.98)}
+  .av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:18px;font-weight:700}
+
+  /* barra do usuário */
+  .me{display:flex;align-items:center;justify-content:space-between;margin-top:18px;gap:10px}
+  .me .who{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+  .me .av{width:34px;height:34px;font-size:14px}
+  .me .swap{background:none;border:0;color:var(--muted);font-size:13px;text-decoration:underline;cursor:pointer;padding:0;margin-left:2px;font-weight:500}
+  .sync{font-size:12.5px;color:var(--muted);white-space:nowrap}
+  .sync.err{color:#b24b33;font-weight:700}
+
+  .tabs{display:flex;background:#ebe6dd;border-radius:12px;padding:4px;margin-top:14px}
+  .tab{flex:1;border:0;background:none;padding:9px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted)}
+  .tab[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+  .stats{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 10px}
+  .statcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:14px}
+  .ring{width:54px;height:54px;flex:none}
+  .stxt{flex:1;min-width:0}
+  .stxt b{font-size:16px;display:block}
+  .stxt small{color:var(--muted);font-size:12.5px}
+  .today-btn{border:0;background:var(--ink);color:#fff;font-weight:700;font-size:13px;border-radius:20px;padding:9px 14px;cursor:pointer}
+
+  .days{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+  .day{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;scroll-margin-top:96px}
+  .day.is-today{box-shadow:0 0 0 2.5px var(--ink)}
+  .day.future{opacity:.7}
+  .dh{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;font-weight:700;font-size:14px}
+  .dh .wd{font-weight:500;font-size:12px;opacity:.75;margin-left:6px;letter-spacing:.5px}
+  .dh .tag{font-size:11px;background:var(--ink);color:#fff;border-radius:10px;padding:2px 8px;margin-left:8px;letter-spacing:.5px}
+  .items{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;padding:6px 8px 8px}
+  .chk{display:flex;align-items:center;gap:10px;padding:9px 6px;border-radius:8px;cursor:pointer;user-select:none;font-size:15px;background:none;border:0;text-align:left}
+  .chk:active{background:#f1ede6}
+  .box{width:22px;height:22px;border:1.8px solid var(--ink);border-radius:5px;flex:none;display:grid;place-items:center;background:#fff;transition:background .15s}
+  .box svg{width:15px;height:15px;opacity:0;transform:scale(.6);transition:all .15s}
+  .chk[aria-pressed="true"] .box{background:var(--ink)}
+  .chk[aria-pressed="true"] .box svg{opacity:1;transform:scale(1)}
+  .alc{display:flex;align-items:center;gap:6px;border-top:1px solid var(--line);margin:0 14px;padding:6px 0 8px;font-size:13.5px;color:var(--muted)}
+  .alc .lbl{margin-right:4px}
+  .alc .chk{font-size:14px;padding:7px 8px}
+  .alc .box{width:19px;height:19px}
+  .alc .box svg{width:13px;height:13px}
+
+  /* turma */
+  .team{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .tm{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+  .tm.mine{border-color:var(--ink)}
+  .tm .pos{width:20px;font-weight:700;color:var(--muted);font-size:14px;text-align:center}
+  .tm .info{flex:1;min-width:0}
+  .tm .nm{font-weight:700;font-size:15.5px;display:flex;justify-content:space-between}
+  .tm .nm span{font-size:15px}
+  .bar{height:8px;background:#ece6dc;border-radius:8px;margin:7px 0 5px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:8px;background:var(--terra);transition:width .3s}
+  .tm small{color:var(--muted);font-size:12.5px}
+  .note{color:var(--muted);font-size:12.5px;text-align:center;margin-top:12px}
+
+  .loading{text-align:center;color:var(--muted);padding:40px 0;font-size:14px}
+  .errbox{background:#fbeee9;border:1px solid #efcfc4;color:#8a4b3b;border-radius:12px;padding:12px 14px;font-size:13.5px;margin-top:16px;line-height:1.45}
+  footer{text-align:center;margin-top:28px}
+  footer .motto{font-weight:700;letter-spacing:.5px;border-top:1px solid #cfc8bc;padding-top:12px}
+  footer .small{color:var(--muted);font-size:11.5px;margin-top:8px;letter-spacing:.5px}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="bars"><i></i><i></i></div>
+    <h1>DESAFIO<span>OHANA</span></h1>
+    <div class="sub">50 DIAS • PEQUENOS HÁBITOS, GRANDES RESULTADOS</div>
+    <div class="dates">28/10/2026 — 16/12/2026</div>
+  </header>
+
+  <div id="loading" class="loading">Carregando…</div>
+  <div id="errbox" class="errbox" hidden></div>
+
+  <section id="picker" class="picker" hidden>
+    <h2>Quem é você?</h2>
+    <p>Escolha seu nome para marcar seus hábitos</p>
+    <div class="people" id="people"></div>
+  </section>
+
+  <section id="main" hidden>
+    <div class="me">
+      <div class="who"><span class="av" id="meAv"></span><span id="meName"></span><button class="swap" id="swap">trocar</button></div>
+      <span class="sync" id="sync"></span>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tabMine" aria-selected="true">Meu desafio</button>
+      <button class="tab" role="tab" id="tabTeam" aria-selected="false">Turma</button>
+    </div>
+
+    <div id="viewMine">
+      <div class="stats">
+        <div class="statcard">
+          <svg class="ring" viewBox="0 0 54 54" aria-hidden="true">
+            <circle cx="27" cy="27" r="22" fill="none" stroke="#e7e1d7" stroke-width="6"/>
+            <circle id="ringFg" cx="27" cy="27" r="22" fill="none" stroke="#c47f6c" stroke-width="6" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="138.2" transform="rotate(-90 27 27)" style="transition:stroke-dashoffset .3s"/>
+            <text id="ringTxt" x="27" y="31" text-anchor="middle" font-size="12" font-weight="700" fill="#233d33" font-family="DM Sans, sans-serif">0%</text>
+          </svg>
+          <div class="stxt"><b id="statTitle"></b><small id="statSub"></small></div>
+          <button class="today-btn" id="todayBtn">Hoje</button>
+        </div>
+      </div>
+      <div class="days" id="days"></div>
+    </div>
+
+    <div id="viewTeam" hidden>
+      <div class="team" id="team"></div>
+      <div class="note">% dos hábitos cumpridos até hoje</div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="motto">DISCIPLINA HOJE, RESULTADOS AMANHÃ.</div>
+    <div class="small">OHANA • JUNTOS EM CADA PEQUENO PASSO</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const PEOPLE = [
+    {id:"giovani",  name:"Giovani",  color:"#8fa595"},
+    {id:"rafaele",  name:"Rafaele",  color:"#c47f6c"},
+    {id:"marcia",   name:"Márcia",   color:"#7f9aa6"},
+    {id:"wagner",   name:"Wagner",   color:"#d4a06c"},
+    {id:"jessica",  name:"Jéssica",  color:"#b48a9a"},
+    {id:"guilherme",name:"Guilherme",color:"#233d33"}
+  ];
+  const ME_KEY = "ohana50_me";
+  const HABITS = ["Alimentação","Hidratação","Sono","Treino"];
+  const WD = ["DOM","SEG","TER","QUA","QUI","SEX","SÁB"];
+  const HEAD = {SEG:"#e1e8e2",TER:"#f1e7da",QUA:"#f3dcd5",QUI:"#dbe6ea",SEX:"#f4e5d3",SÁB:"#e3e8df",DOM:"#efe7da"};
+  const START = new Date(2026, 9, 28), TOTAL = 50;
+  const CHECK = '<svg viewBox="0 0 16 16"><path d="M3.2 8.4l3 3 6.6-6.8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const $ = id => document.getElementById(id);
+
+  let me = null, data = {}, pending = 0, failed = false;
+  PEOPLE.forEach(p => data[p.id] = {});
+  try { me = localStorage.getItem(ME_KEY); } catch(e){}
+  if(!PEOPLE.some(p=>p.id===me)) me = null;
+
+  // ---------- dias ----------
+  const days = [];
+  for(let i=0;i<TOTAL;i++){
+    const d = new Date(START); d.setDate(START.getDate()+i);
+    const wd = WD[d.getDay()];
+    days.push({n:i+1, wd, label:String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0"), alc:["SEX","SÁB","DOM"].includes(wd)});
+  }
+  function todayIdx(){ const n=new Date(); return Math.round((new Date(n.getFullYear(),n.getMonth(),n.getDate()) - START)/86400000); }
+  const T = todayIdx();
+
+  // ---------- servidor ----------
+  async function load(){
+    const r = await fetch("/api/state", {cache:"no-store"});
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error||"http");
+    PEOPLE.forEach(p => { data[p.id] = (j.people && j.people[p.id]) || {}; });
+  }
+  async function send(set, unset){
+    pending++; showSync();
+    for(let attempt=0; attempt<3; attempt++){
+      try{
+        const r = await fetch("/api/state", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({person:me, set, unset})});
+        if(r.ok){ pending--; failed=false; showSync(); return true; }
+      }catch(e){}
+      await new Promise(res=>setTimeout(res, 800*(attempt+1)));
+    }
+    pending--; failed=true; showSync(); return false;
+  }
+  function showSync(){
+    const s=$("sync");
+    if(failed){ s.textContent="⚠ Não salvou — confira a internet"; s.className="sync err"; }
+    else if(pending){ s.textContent="Salvando…"; s.className="sync"; }
+    else { s.textContent="✓ Salvo"; s.className="sync"; }
+  }
+
+  // ---------- quem é você ----------
+  function av(p, el){ el.textContent=p.name[0]; el.style.background=p.color; }
+  PEOPLE.forEach(p=>{
+    const b=document.createElement("button"); b.className="person";
+    b.innerHTML='<span class="av"></span><span></span>';
+    av(p, b.firstChild); b.lastChild.textContent=p.name;
+    b.addEventListener("click", ()=>{ me=p.id; try{localStorage.setItem(ME_KEY,me);}catch(e){} enter(); });
+    $("people").appendChild(b);
+  });
+  $("swap").addEventListener("click", ()=>{ $("main").hidden=true; $("picker").hidden=false; scrollTo(0,0); });
+
+  function enter(){
+    const p = PEOPLE.find(x=>x.id===me);
+    av(p, $("meAv")); $("meName").textContent=p.name;
+    $("picker").hidden=true; $("main").hidden=false;
+    failed=false; $("sync").textContent="";
+    renderDays(); stats(); renderTeam(); selectTab("mine");
+    if(T>0) setTimeout(()=>goToday(false), 60);
+  }
+
+  // ---------- meu desafio ----------
+  const list = $("days");
+  function btn(id,label,group){ return `<button class="chk" type="button" data-id="${id}"${group?` data-group="${group}"`:''} aria-pressed="false"><span class="box">${CHECK}</span>${label}</button>`; }
+  days.forEach(day=>{
+    const el=document.createElement("section"); el.className="day"; el.id="dia-"+day.n;
+    if(day.n-1===T) el.classList.add("is-today");
+    if(T>=0 && day.n-1>T) el.classList.add("future");
+    let h=`<div class="dh" style="background:${HEAD[day.wd]}"><span>DIA ${day.n}<span class="wd">${day.wd}</span>${day.n-1===T?'<span class="tag">HOJE</span>':''}</span><span>${day.label}</span></div><div class="items">`;
+    HABITS.forEach((hb,j)=>h+=btn(day.n+"_"+j,hb));
+    h+="</div>";
+    if(day.alc) h+=`<div class="alc"><span class="lbl">Álcool:</span>${btn(day.n+"_an","Não",day.n)}${btn(day.n+"_as","Sim",day.n)}</div>`;
+    el.innerHTML=h; list.appendChild(el);
+  });
+  function renderDays(){
+    const s=data[me]||{};
+    list.querySelectorAll(".chk").forEach(b=>b.setAttribute("aria-pressed", s[b.dataset.id]?"true":"false"));
+  }
+  list.addEventListener("click", e=>{
+    const b=e.target.closest(".chk"); if(!b||!me) return;
+    const s=data[me], id=b.dataset.id, on=!s[id];
+    const set=[], unset=[];
+    if(b.dataset.group && on){
+      list.querySelectorAll(`.chk[data-group="${b.dataset.group}"]`).forEach(o=>{ if(o!==b && s[o.dataset.id]){ delete s[o.dataset.id]; o.setAttribute("aria-pressed","false"); unset.push(o.dataset.id);} });
+    }
+    if(on){ s[id]=1; set.push(id); } else { delete s[id]; unset.push(id); }
+    b.setAttribute("aria-pressed", on?"true":"false");
+    stats(); renderTeam();
+    send(set, unset);
+  });
+
+  function score(pid){
+    const s=data[pid]||{}; const elapsed=Math.min(TOTAL,Math.max(0,T+1));
+    let done=0; for(let d=1; d<=elapsed; d++) for(let j=0;j<4;j++) if(s[d+"_"+j]) done++;
+    let today=0; if(T>=0&&T<TOTAL) for(let j=0;j<4;j++) if(s[(T+1)+"_"+j]) today++;
+    const base=elapsed*4;
+    return {done, base, pct: base?Math.round(done/base*100):0, today};
+  }
+  function stats(){
+    const sc=score(me);
+    $("ringFg").setAttribute("stroke-dashoffset",(138.2*(1-Math.min(sc.pct,100)/100)).toFixed(1));
+    $("ringTxt").textContent=sc.pct+"%";
+    $("statTitle").textContent = T<0 ? (T===-1?"Começa amanhã!":"Começa em "+(-T)+" dias") : T>=TOTAL ? "Desafio concluído!" : "Dia "+(T+1)+" de 50";
+    $("statSub").textContent = sc.base ? `${sc.done} de ${sc.base} hábitos até hoje` : "Seu progresso aparece aqui";
+  }
+  function goToday(smooth){ const el=$("dia-"+(Math.min(TOTAL-1,Math.max(0,T))+1)); if(el) el.scrollIntoView({behavior:smooth?"smooth":"auto",block:"start"}); }
+  $("todayBtn").addEventListener("click", ()=>goToday(true));
+
+  // ---------- turma ----------
+  function renderTeam(){
+    const rows = PEOPLE.map(p=>({p, sc:score(p.id)})).sort((a,b)=>b.sc.pct-a.sc.pct || b.sc.done-a.sc.done || a.p.name.localeCompare(b.p.name));
+    const started = T>=0;
+    $("team").innerHTML="";
+    rows.forEach((r,i)=>{
+      const el=document.createElement("div"); el.className="tm"+(r.p.id===me?" mine":"");
+      el.innerHTML=`${started?`<span class="pos">${i+1}º</span>`:""}<span class="av"></span><div class="info"><div class="nm"><b></b><span>${r.sc.pct}%</span></div><div class="bar"><i style="width:${r.sc.pct}%"></i></div><small>${started&&T<TOTAL?`Hoje: ${r.sc.today}/4 · `:""}${r.sc.done} hábitos no total</small></div>`;
+      av(r.p, el.querySelector(".av")); el.querySelector("b").textContent=r.p.name;
+      $("team").appendChild(el);
+    });
+  }
+  function selectTab(t){
+    $("tabMine").setAttribute("aria-selected", t==="mine"); $("tabTeam").setAttribute("aria-selected", t==="team");
+    $("viewMine").hidden = t!=="mine"; $("viewTeam").hidden = t!=="team";
+  }
+  $("tabMine").addEventListener("click", ()=>selectTab("mine"));
+  $("tabTeam").addEventListener("click", async ()=>{ selectTab("team"); await refresh(); });
+
+  async function refresh(){
+    if(pending) return;
+    try{ await load(); if(me){ renderDays(); stats(); } renderTeam(); }catch(e){}
+  }
+  document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="visible") refresh(); });
+  setInterval(()=>{ if(document.visibilityState==="visible" && !$("viewTeam").hidden) refresh(); }, 30000);
+
+  // ---------- início ----------
+  load().then(()=>{
+    $("loading").hidden=true;
+    if(me) enter(); else $("picker").hidden=false;
+  }).catch(err=>{
+    $("loading").hidden=true;
+    const eb=$("errbox"); eb.hidden=false;
+    eb.textContent = err.message==="no_db"
+      ? "O banco de dados ainda não foi conectado na Vercel. (Storage → Upstash Redis → conectar ao projeto → Redeploy)"
+      : "Não consegui carregar as marcações. Confira a internet e recarregue a página.";
+  });
+})();
+</script>
+</body>
+</html>
