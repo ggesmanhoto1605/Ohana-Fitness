@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f6f3ee">
-<title>Desafio Ohana · 50 dias</title>
+<title>Desafio Ohana · 57 dias</title>
 <link rel="icon" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -99,8 +99,8 @@
   <header>
     <div class="bars"><i></i><i></i></div>
     <h1>DESAFIO<span>OHANA</span></h1>
-    <div class="sub">50 DIAS • PEQUENOS HÁBITOS, GRANDES RESULTADOS</div>
-    <div class="dates">28/10/2026 — 16/12/2026</div>
+    <div class="sub">57 DIAS • PEQUENOS HÁBITOS, GRANDES RESULTADOS</div>
+    <div class="dates">28/10/2026 — 23/12/2026</div>
   </header>
 
   <div id="loading" class="loading">Carregando…</div>
@@ -163,7 +163,7 @@
   const HABITS = ["Alimentação","Hidratação","Sono","Treino"];
   const WD = ["DOM","SEG","TER","QUA","QUI","SEX","SÁB"];
   const HEAD = {SEG:"#e1e8e2",TER:"#f1e7da",QUA:"#f3dcd5",QUI:"#dbe6ea",SEX:"#f4e5d3",SÁB:"#e3e8df",DOM:"#efe7da"};
-  const START = new Date(2026, 9, 28), TOTAL = 50;
+  const START = new Date(2026, 9, 28), TOTAL = 57;
   const CHECK = '<svg viewBox="0 0 16 16"><path d="M3.2 8.4l3 3 6.6-6.8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const $ = id => document.getElementById(id);
 
@@ -268,7 +268,7 @@
     const sc=score(me);
     $("ringFg").setAttribute("stroke-dashoffset",(138.2*(1-Math.min(sc.pct,100)/100)).toFixed(1));
     $("ringTxt").textContent=sc.pct+"%";
-    $("statTitle").textContent = T<0 ? (T===-1?"Começa amanhã!":"Começa em "+(-T)+" dias") : T>=TOTAL ? "Desafio concluído!" : "Dia "+(T+1)+" de 50";
+    $("statTitle").textContent = T<0 ? (T===-1?"Começa amanhã!":"Começa em "+(-T)+" dias") : T>=TOTAL ? "Desafio concluído!" : "Dia "+(T+1)+" de "+TOTAL;
     $("statSub").textContent = sc.base ? `${sc.done} de ${sc.base} hábitos até hoje` : "Seu progresso aparece aqui";
   }
   function goToday(smooth){ const el=$("dia-"+(Math.min(TOTAL-1,Math.max(0,T))+1)); if(el) el.scrollIntoView({behavior:smooth?"smooth":"auto",block:"start"}); }

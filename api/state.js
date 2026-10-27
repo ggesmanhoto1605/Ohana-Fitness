@@ -1,6 +1,6 @@
 // Desafio Ohana — API de marcações (Vercel + Upstash Redis, sem dependências)
 const PEOPLE = ["giovani", "rafaele", "marcia", "wagner", "jessica", "guilherme"];
-const ID_RE = /^([1-9]|[1-4][0-9]|50)_(0|1|2|3|an|as)$/;
+const ID_RE = /^([1-9]|[1-4][0-9]|5[0-7])_(0|1|2|3|an|as)$/;
 
 function cfg() {
   const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
