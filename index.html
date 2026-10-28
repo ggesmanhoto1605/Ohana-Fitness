@@ -162,7 +162,7 @@
 
   <section id="goalsv" class="goalsv" hidden>
     <h2>Quais são as suas metas?</h2>
-    <p>Defina o que é 100% para você em cada hábito. Depois, todo dia, você marca quanto cumpriu: de 0 a 100%.</p>
+    <p>Defina o que é 100% para você em cada hábito. Pode escolher várias opções. Depois, todo dia, você marca quanto cumpriu: de 0 a 100%.</p>
     <div id="gcards"></div>
     <div class="gact"><button class="gskip" id="gskip">Depois</button><button class="gsave" id="gsave">Salvar metas</button></div>
   </section>
@@ -300,19 +300,25 @@
   }
 
   // ---------- metas ----------
+  const SEP="; ";
   function openGoals(){
     $("main").hidden=true; $("goalsv").hidden=false; scrollTo(0,0);
-    $("gcards").innerHTML = HABITS.map((h,j)=>`<div class="gcard"><b>${h}</b><div class="q">${PERG[j]}</div>
-      <div class="sugs">${SUG[j].map(t=>`<button type="button" class="sug" data-j="${j}">${esc(t)}</button>`).join("")}</div>
-      <input class="gin" id="gin${j}" maxlength="80" placeholder="Ou escreva a sua meta" value="${esc(meta(me,j))}"></div>`).join("");
-    marcarSug();
+    $("gcards").innerHTML = HABITS.map((h,j)=>{
+      const partes=meta(me,j).split(SEP).map(x=>x.trim()).filter(Boolean);
+      const outras=partes.filter(x=>!SUG[j].includes(x)).join(SEP);
+      return `<div class="gcard"><b>${h}</b><div class="q">${PERG[j]} Pode marcar mais de uma.</div>
+      <div class="sugs">${SUG[j].map(t=>`<button type="button" class="sug${partes.includes(t)?" on":""}" data-j="${j}" aria-pressed="${partes.includes(t)}">${esc(t)}</button>`).join("")}</div>
+      <input class="gin" id="gin${j}" maxlength="80" placeholder="Outra meta (opcional)" value="${esc(outras)}"></div>`;}).join("");
   }
-  function marcarSug(){ document.querySelectorAll(".sug").forEach(b=>b.classList.toggle("on", $("gin"+b.dataset.j).value.trim()===b.textContent)); }
-  $("gcards").addEventListener("click", e=>{ const b=e.target.closest(".sug"); if(!b) return; $("gin"+b.dataset.j).value=b.textContent; marcarSug(); });
-  $("gcards").addEventListener("input", marcarSug);
+  $("gcards").addEventListener("click", e=>{ const b=e.target.closest(".sug"); if(!b) return; const on=!b.classList.contains("on"); b.classList.toggle("on",on); b.setAttribute("aria-pressed",on); });
   $("gsave").addEventListener("click", async ()=>{
     const set=[], unset=[];
-    for(let j=0;j<4;j++){ const v=$("gin"+j).value.trim().slice(0,80); if(v){ set.push({id:"meta_"+j, v}); data[me]["meta_"+j]=v; } else if(meta(me,j)){ unset.push("meta_"+j); delete data[me]["meta_"+j]; } }
+    for(let j=0;j<4;j++){
+      const escolhidas=[...document.querySelectorAll(`.sug.on[data-j="${j}"]`)].map(b=>b.textContent);
+      const outra=$("gin"+j).value.trim(); if(outra) escolhidas.push(outra);
+      const v=escolhidas.join(SEP).slice(0,200);
+      if(v){ set.push({id:"meta_"+j, v}); data[me]["meta_"+j]=v; } else if(meta(me,j)){ unset.push("meta_"+j); delete data[me]["meta_"+j]; }
+    }
     if(set.length||unset.length) send(set, unset);
     try{ localStorage.setItem(SKIP_KEY+"_"+me,"1"); }catch(e){}
     $("goalsv").hidden=true; $("main").hidden=false;

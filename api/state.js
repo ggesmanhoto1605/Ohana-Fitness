@@ -38,7 +38,7 @@ function normalize(item) {
   if (ALC_RE.test(id)) return [id, "1"];
   if (META_RE.test(id)) {
     if (typeof v !== "string") return null;
-    const t = v.replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 80);
+    const t = v.replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 200);
     return t ? [id, t] : null;
   }
   return null;
