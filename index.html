@@ -144,6 +144,32 @@
   footer{text-align:center;margin-top:28px}
   footer .motto{font-weight:700;letter-spacing:.5px;border-top:1px solid #cfc8bc;padding-top:12px}
   footer .small{color:var(--muted);font-size:11.5px;margin-top:8px;letter-spacing:.5px}
+
+  /* fotos */
+  .cam{border:0;background:none;padding:2px 4px;margin-left:4px;vertical-align:-3px;cursor:pointer;color:var(--muted)}
+  .cam svg{width:18px;height:18px}
+  .cam.tem{color:var(--terra)}
+  .feed{display:flex;flex-direction:column;gap:14px;margin-top:14px}
+  .post{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .post .ph{display:flex;align-items:center;gap:10px;padding:10px 12px}
+  .post .ph .av{width:34px;height:34px;font-size:14px}
+  .post .ph b{font-size:15px;display:block}
+  .post .ph small{color:var(--muted);font-size:12.5px}
+  .post .ph .del{margin-left:auto;border:0;background:none;color:var(--muted);font-size:12.5px;text-decoration:underline;cursor:pointer}
+  .post img{display:block;width:100%;height:auto;background:#ebe6dd;min-height:200px}
+  .post .pf{display:flex;align-items:center;gap:10px;padding:10px 12px 12px}
+  .like{border:0;background:none;display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;cursor:pointer;padding:4px 2px}
+  .like svg{width:24px;height:24px;transition:transform .15s}
+  .like.on svg{fill:#d0566b;stroke:#d0566b}
+  .like:active svg{transform:scale(1.2)}
+  .post .leg{padding:0 12px 12px;font-size:14.5px;line-height:1.45}
+  .post .quem{color:var(--muted);font-size:12.5px;padding:0 12px 12px;margin-top:-6px}
+  .vazio{text-align:center;color:var(--muted);font-size:14px;padding:30px 10px;line-height:1.5}
+  .sheet{position:fixed;inset:0;z-index:50;background:rgba(20,30,25,.55);display:flex;align-items:flex-end;justify-content:center}
+  .sheet .box2{background:var(--bg);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+  .sheet h3{margin:0 0 10px;font-size:17px}
+  .sheet img{width:100%;max-height:46vh;object-fit:contain;border-radius:12px;background:#000}
+  .sheet .gin{margin-top:10px}
   [hidden]{display:none!important}
 </style>
 </head>
@@ -180,6 +206,7 @@
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" id="tabMine" aria-selected="true">Meu desafio</button>
       <button class="tab" role="tab" id="tabTeam" aria-selected="false">Turma</button>
+      <button class="tab" role="tab" id="tabFotos" aria-selected="false">Fotos</button>
     </div>
 
     <div id="viewMine">
@@ -202,7 +229,21 @@
       <div class="team" id="team"></div>
       <div class="note">Média do quanto cada um cumpriu das próprias metas até hoje. Toque num nome para ver as metas.</div>
     </div>
+
+    <div id="viewFotos" hidden>
+      <div class="feed" id="feed"><div class="vazio">Carregando fotos…</div></div>
+    </div>
   </section>
+
+  <input type="file" id="fileIn" accept="image/*" hidden>
+  <div class="sheet" id="sheet" hidden>
+    <div class="box2">
+      <h3 id="sheetTit">Nova foto</h3>
+      <img id="sheetImg" alt="Prévia da foto">
+      <input class="gin" id="sheetLeg" maxlength="140" placeholder="Escreva uma legenda (opcional)">
+      <div class="gact" style="margin-top:12px"><button class="gskip" id="sheetNo">Cancelar</button><button class="gsave" id="sheetOk">Postar</button></div>
+    </div>
+  </div>
 
   <footer>
     <div class="motto">DISCIPLINA HOJE, RESULTADOS AMANHÃ.</div>
@@ -347,7 +388,7 @@
     if(T>=0 && day.n-1>T) el.classList.add("future");
     let h=`<div class="dh" style="background:${HEAD[day.wd]}"><span>DIA ${day.n}<span class="wd">${day.wd}</span>${day.n-1===T?'<span class="tag">HOJE</span>':''}</span><span>${day.label}</span></div><div class="items">`;
     HABITS.forEach((hb,j)=>{ const id=day.n+"_"+j;
-      h+=`<div class="hab" data-id="${id}"><div class="hl"><b>${hb}</b><small class="g${j}"></small></div><input class="rng" type="range" min="0" max="100" step="10" value="0" data-id="${id}" aria-label="${hb}, dia ${day.n}"><output>0%</output></div>`; });
+      h+=`<div class="hab" data-id="${id}"><div class="hl"><b>${hb}<button type="button" class="cam" data-day="${day.n}" data-h="${j}" aria-label="Foto de ${hb}, dia ${day.n}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.5"/></svg></button></b><small class="g${j}"></small></div><input class="rng" type="range" min="0" max="100" step="10" value="0" data-id="${id}" aria-label="${hb}, dia ${day.n}"><output>0%</output></div>`; });
     h+="</div>";
     if(day.alc) h+=`<div class="alc"><span class="lbl">Álcool:</span>${btn(day.n+"_an","Não",day.n)}${btn(day.n+"_as","Sim",day.n)}</div>`;
     el.innerHTML=h; list.appendChild(el);
@@ -412,8 +453,8 @@
     });
   }
   function selectTab(t){
-    $("tabMine").setAttribute("aria-selected", t==="mine"); $("tabTeam").setAttribute("aria-selected", t==="team");
-    $("viewMine").hidden = t!=="mine"; $("viewTeam").hidden = t!=="team";
+    $("tabMine").setAttribute("aria-selected", t==="mine"); $("tabTeam").setAttribute("aria-selected", t==="team"); $("tabFotos").setAttribute("aria-selected", t==="fotos");
+    $("viewMine").hidden = t!=="mine"; $("viewTeam").hidden = t!=="team"; $("viewFotos").hidden = t!=="fotos";
   }
   $("tabMine").addEventListener("click", ()=>selectTab("mine"));
   $("tabTeam").addEventListener("click", async ()=>{ selectTab("team"); await refresh(); });
@@ -423,7 +464,89 @@
     try{ await load(); if(me && !$("main").hidden){ renderDays(); stats(); } renderTeam(); }catch(e){}
   }
   document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="visible") refresh(); });
-  setInterval(()=>{ if(document.visibilityState==="visible" && !$("viewTeam").hidden) refresh(); }, 30000);
+  setInterval(()=>{ if(document.visibilityState!=="visible") return; if(!$("viewTeam").hidden) refresh(); if(!$("viewFotos").hidden) loadFotos().then(renderFeed).catch(()=>{}); }, 30000);
+
+
+  // ---------- fotos ----------
+  let fotos = [], alvo = null, imgPronta = null;
+  const LIKE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>';
+  async function loadFotos(){
+    const r=await fetch("/api/photos",{cache:"no-store"}); const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error("fotos"); fotos=j.fotos||[];
+  }
+  function quando(ts){ const d=new Date(ts); return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+" às "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+  function nomeDe(id){ return (PEOPLE.find(p=>p.id===id)||{}).name||id; }
+  function renderFeed(){
+    const f=$("feed");
+    if(!fotos.length){ f.innerHTML='<div class="vazio">Nenhuma foto ainda.<br>Toque na câmera ao lado de um hábito em "Meu desafio" para postar a primeira.</div>'; return; }
+    f.innerHTML="";
+    fotos.forEach(ft=>{
+      const p=PEOPLE.find(x=>x.id===ft.person); if(!p) return;
+      const curti=ft.curtidas.includes(me), n=ft.curtidas.length;
+      const el=document.createElement("article"); el.className="post";
+      el.innerHTML=`<div class="ph"><span class="av"></span><div><b></b><small>${HABITS[ft.habit]} · Dia ${ft.day} · ${quando(ft.ts)}</small></div>${ft.person===me?'<button class="del">apagar</button>':''}</div>
+        <img loading="lazy" alt="Foto de ${esc(p.name)}: ${HABITS[ft.habit]}, dia ${ft.day}" src="/api/photos?img=${ft.id}">
+        <div class="pf"><button class="like${curti?" on":""}" aria-pressed="${curti}">${LIKE}<span>${n||""}</span></button></div>
+        ${ft.legenda?`<div class="leg"></div>`:""}
+        ${n?`<div class="quem">Curtido por ${ft.curtidas.map(nomeDe).join(", ")}</div>`:""}`;
+      av(p, el.querySelector(".av")); el.querySelector("b").textContent=p.name;
+      if(ft.legenda) el.querySelector(".leg").textContent=ft.legenda;
+      el.querySelector(".like").addEventListener("click", ()=>curtir(ft));
+      const del=el.querySelector(".del"); if(del) del.addEventListener("click", ()=>apagar(ft));
+      f.appendChild(el);
+    });
+  }
+  async function curtir(ft){
+    if(!me) return; const on=!ft.curtidas.includes(me);
+    ft.curtidas = on ? ft.curtidas.concat(me) : ft.curtidas.filter(x=>x!==me); renderFeed();
+    try{ await fetch("/api/photos",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({acao:"curtir",person:me,id:ft.id,on})}); }catch(e){}
+  }
+  async function apagar(ft){
+    if(!confirm("Apagar esta foto?")) return;
+    fotos=fotos.filter(x=>x.id!==ft.id); renderFeed(); marcarCams();
+    try{ await fetch("/api/photos",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({acao:"apagar",person:me,id:ft.id})}); }catch(e){}
+  }
+  function marcarCams(){
+    const tem=new Set(fotos.filter(f=>f.person===me).map(f=>f.day+"_"+f.habit));
+    list.querySelectorAll(".cam").forEach(b=>b.classList.toggle("tem", tem.has(b.dataset.day+"_"+b.dataset.h)));
+  }
+  list.addEventListener("click", e=>{
+    const c=e.target.closest(".cam"); if(!c||!me) return;
+    e.stopPropagation(); alvo={day:+c.dataset.day, habit:+c.dataset.h};
+    $("fileIn").value=""; $("fileIn").click();
+  }, true);
+  function reduz(file){
+    return new Promise((ok,err)=>{
+      const url=URL.createObjectURL(file), im=new Image();
+      im.onload=()=>{ const M=1080, k=Math.min(1, M/Math.max(im.naturalWidth,im.naturalHeight));
+        const cv=document.createElement("canvas"); cv.width=Math.round(im.naturalWidth*k); cv.height=Math.round(im.naturalHeight*k);
+        cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height); URL.revokeObjectURL(url);
+        let q=.74, d=cv.toDataURL("image/jpeg",q); while(d.length>440000 && q>.4){ q-=.08; d=cv.toDataURL("image/jpeg",q); }
+        ok(d); };
+      im.onerror=()=>{ URL.revokeObjectURL(url); err(new Error("img")); };
+      im.src=url;
+    });
+  }
+  $("fileIn").addEventListener("change", async ()=>{
+    const f=$("fileIn").files[0]; if(!f||!alvo) return;
+    try{ imgPronta=await reduz(f); }catch(e){ alert("Não consegui abrir essa imagem. Tente outra."); return; }
+    $("sheetTit").textContent=HABITS[alvo.habit]+" · Dia "+alvo.day; $("sheetImg").src=imgPronta; $("sheetLeg").value=""; $("sheet").hidden=false;
+  });
+  $("sheetNo").addEventListener("click", ()=>{ $("sheet").hidden=true; imgPronta=null; });
+  $("sheetOk").addEventListener("click", async ()=>{
+    if(!imgPronta||!alvo) return;
+    const btn=$("sheetOk"); btn.disabled=true; btn.textContent="Enviando…";
+    try{
+      const r=await fetch("/api/photos",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({person:me,day:alvo.day,habit:alvo.habit,legenda:$("sheetLeg").value,img:imgPronta.split(",")[1]})});
+      const j=await r.json().catch(()=>({}));
+      if(!r.ok) throw new Error(j.error||"http");
+      fotos.unshift(j.foto); renderFeed(); marcarCams();
+      $("sheet").hidden=true; imgPronta=null; selectTab("fotos"); scrollTo(0,0);
+    }catch(e){ alert("A foto não foi enviada. Confira a internet e tente de novo."); }
+    btn.disabled=false; btn.textContent="Postar";
+  });
+  $("tabFotos").addEventListener("click", async ()=>{ selectTab("fotos"); try{ await loadFotos(); renderFeed(); marcarCams(); }catch(e){ $("feed").innerHTML='<div class="vazio">Não consegui carregar as fotos. Confira a internet.</div>'; } });
+  loadFotos().then(()=>{ renderFeed(); marcarCams(); }).catch(()=>{});
 
   // ---------- início ----------
   load().then(()=>{
